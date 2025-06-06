@@ -1,0 +1,2 @@
+[console_scripts]
+repronotebook = repronotebook.cli:main

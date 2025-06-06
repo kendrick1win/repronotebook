@@ -1,0 +1,9 @@
+[project]
+name = "repronotebook"
+version = "0.1.0"
+description = "Reproducibility validator for Jupyter notebooks"
+authors = [{name = "Kendrick Lwin"}]
+dependencies = ["click", "pipreqs", "nbconvert", "nbformat", "rich"]
+
+[project.scripts]
+repronotebook = "repronotebook.cli:main"
