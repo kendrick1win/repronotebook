@@ -24,3 +24,15 @@ def get_kernel_name(notebook_path: str) -> str:
     # 3. Safely extracts the kernel name
     return nb.metadata.get("kernelspec", {}).get("name", None)
 
+def is_kernel_installed(kernel_name: str) -> bool:
+    try:
+        # runs a shell command
+        result = subprocess.run(
+            ['jupyter', 'kernelspec', 'list'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return kernel_name in result.stdout
+    except subprocess.CalledProcessError:
+        return False
