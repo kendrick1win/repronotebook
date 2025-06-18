@@ -1,0 +1,127 @@
+{
+    "@context": "https://w3id.org/ro/crate/1.1/context",
+    "@graph": [
+        {
+            "@id": "./",
+            "@type": "Dataset",
+            "author": {
+                "@id": "#author"
+            },
+            "datePublished": "2025-06-18",
+            "description": "\n## Running in NoMachine",
+            "hasPart": [
+                {
+                    "@id": "unknown.txt"
+                },
+                {
+                    "@id": "Lab1_sol.ipynb"
+                },
+                {
+                    "@id": "reference.txt"
+                },
+                {
+                    "@id": "LICENSE"
+                },
+                {
+                    "@id": "requirements.txt"
+                },
+                {
+                    "@id": "Englishencrypt.txt"
+                },
+                {
+                    "@id": "README.md"
+                },
+                {
+                    "@id": ".gitignore"
+                },
+                {
+                    "@id": "English.txt"
+                },
+                {
+                    "@id": "Lab1.ipynb"
+                },
+                {
+                    "@id": "Dutch.txt"
+                }
+            ],
+            "keywords": [
+                "jupyter",
+                "reproducibility",
+                "RO-Crate",
+                "notebook",
+                "biomedical"
+            ],
+            "license": "https://www.apache.org/licenses/LICENSE-2.0",
+            "name": "Lab 1"
+        },
+        {
+            "@id": "ro-crate-metadata.json",
+            "@type": "CreativeWork",
+            "about": {
+                "@id": "./"
+            },
+            "conformsTo": {
+                "@id": "https://w3id.org/ro/crate/1.1"
+            }
+        },
+        {
+            "@id": "unknown.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "Lab1_sol.ipynb",
+            "@type": "File",
+            "programmingLanguage": {
+                "@id": "https://w3id.org/ro/terms#Python",
+                "alternateName": "py",
+                "name": "Python"
+            }
+        },
+        {
+            "@id": "reference.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "LICENSE",
+            "@type": "File"
+        },
+        {
+            "@id": "requirements.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "Englishencrypt.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "README.md",
+            "@type": "File"
+        },
+        {
+            "@id": ".gitignore",
+            "@type": "File"
+        },
+        {
+            "@id": "English.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "Lab1.ipynb",
+            "@type": "File",
+            "programmingLanguage": {
+                "@id": "https://w3id.org/ro/terms#Python",
+                "alternateName": "py",
+                "name": "Python"
+            }
+        },
+        {
+            "@id": "Dutch.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "#author",
+            "@type": "Person",
+            "name": "Hugh"
+        }
+    ]
+}
