@@ -1,6 +1,7 @@
 from rocrate.rocrate import ROCrate
 from pathlib import Path
 from datetime import date
+from rocrate.model.person import Person
 
 def generate_ro_crate_with_library(folder_path: str, author_name: str):
     # set up input and output paths to folders
@@ -21,9 +22,7 @@ def generate_ro_crate_with_library(folder_path: str, author_name: str):
     crate.metadata.datePublished = str(date.today())
 
     # Step 4: Add author info
-    author = crate.add_person(
-        {"id": "#author", "name": author_name}
-    )
+    author = crate.add(Person(crate, "#author", properties={"name": author_name}))
     crate.metadata.author = author
 
     # Step 5: Write the crate to disk

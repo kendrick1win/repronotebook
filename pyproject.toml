@@ -3,7 +3,7 @@ name = "repronotebook"
 version = "0.1.0"
 description = "Reproducibility validator for Jupyter notebooks"
 authors = [{name = "Kendrick Lwin"}]
-dependencies = ["click", "pipreqs", "nbconvert", "nbformat", "rich"]
+dependencies = ["click", "pipreqs", "nbconvert", "nbformat", "rich", "rocrate"]
 
 [project.scripts]
 repronotebook = "repronotebook.cli:main"
