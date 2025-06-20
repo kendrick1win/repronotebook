@@ -34,10 +34,11 @@ def generate_ro_crate_with_library(folder_path: str, author_name: str):
     # Create a new RO-Crate object
     crate = ROCrate()
 
-    # Add all files in the folder
-    for file in folder.iterdir():
+   # Add all files including subfolders
+    for file in folder.rglob("*"):
         if file.is_file():
-            crate.add_file(str(file), dest_path=file.name)
+            rel_path = file.relative_to(folder)
+            crate.add_file(str(file), dest_path=str(rel_path))
     
     # Extract title/description/license metadata
     title, description = extract_readme_metadata(folder)
@@ -50,7 +51,7 @@ def generate_ro_crate_with_library(folder_path: str, author_name: str):
     root["name"] = title
     root["description"] = description
     root["datePublished"] = str(date.today())
-    root["keywords"] = ["jupyter", "reproducibility", "RO-Crate", "notebook", "biomedical"]
+    #root["keywords"] = ["jupyter", "reproducibility", "RO-Crate", "notebook", "biomedical"]
     root["license"] = license_url
 
     # Add author info 

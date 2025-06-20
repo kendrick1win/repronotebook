@@ -1,5 +1,6 @@
 {
     "@context": "https://w3id.org/ro/crate/1.1/context",
+
     "@graph": [
         {
             "@id": "./",
@@ -9,6 +10,7 @@
             },
             "datePublished": "2025-06-18",
             "description": "\n## Running in NoMachine",
+
             "hasPart": [
                 {
                     "@id": "unknown.txt"
@@ -44,16 +46,24 @@
                     "@id": "Dutch.txt"
                 }
             ],
+
+            
+            "_comment": "/* keywords were hardcoded going to change this */",
+            
             "keywords": [
                 "jupyter",
                 "reproducibility",
                 "RO-Crate",
                 "notebook",
                 "biomedical"
-            ],
+                
+            ], 
+            
+
             "license": "https://www.apache.org/licenses/LICENSE-2.0",
             "name": "Lab 1"
         },
+
         {
             "@id": "ro-crate-metadata.json",
             "@type": "CreativeWork",
