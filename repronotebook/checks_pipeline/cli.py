@@ -4,6 +4,13 @@ from rich import print
 from pathlib import Path
 import os
 from repronotebook.checks_pipeline.styling_check.styling import run_flakenb
+from repronotebook.checks_pipeline.dependency_check.dependency import (
+    extract_imports_from_notebook,
+    check_existing_dependency_file,
+    generate_requirements,
+    generate_environment_yml
+)
+
 
 @click.command()
 @click.argument('notebook_path')
@@ -23,21 +30,48 @@ def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
     for nb in notebooks:
         relative_name = nb.relative_to(Path.cwd())
         print(f"\n[bold cyan]🔍 Processing:[/] {relative_name}")
+        # Style check
+        print("[bold]🎨 Checking code style with flakenb...[/]")
+        style_issues = run_flakenb(str(nb))
+        if style_issues:
+            print(f"[yellow]⚠️ {len(style_issues)} style issue(s) found in {nb.name}:[/]")
+            for line in style_issues:
+                print("  ", line)
+            
+            if fail_on_style:
+                print("[red]❌ Aborting due to style issues (use --fail-on-style to disable this check).[/]")
+                return  # or sys.exit(1)
+            else:
+                print("[green]✅ No PEP8 style issues detected[/]")
+            
+        # ✅ Extract imports from the notebook
+        notebook_imports = extract_imports_from_notebook(str(nb))
+            
+        # ✅ Handle requirements.txt
+        req_path = nb.parent / "requirements.txt"
+        if req_path.exists():
+            all_present, missing = check_existing_dependency_file(req_path, notebook_imports)
+            if all_present:
+                print("[green]✅ All notebook imports are already in requirements.txt[/]")
+            else:
+                print(f"[yellow]⚠️ requirements.txt exists but is missing: {missing}[/]")
+        else:
+            if generate_requirements(str(nb), nb.parent, overwrite=True):
+                print("[green]✅ requirements.txt generated[/]")
 
+        # ✅ Handle environment.yml
+        env_path = nb.parent / "environment.yml"
+        if env_path.exists():
+            all_present, missing = check_existing_dependency_file(env_path, notebook_imports)
+            if all_present:
+                print("[green]✅ All notebook imports are already in environment.yml[/]")
+            else:
+                print(f"[yellow]⚠️ environment.yml exists but is missing: {missing}[/]")
+        else:
+            if generate_environment_yml(str(nb), nb.parent, overwrite=True):
+                print("[green]✅ environment.yml generated[/]")
 
-    # Style check
-    print("[bold]🎨 Checking code style with flakenb...[/]")
-    style_issues = run_flakenb(str(notebook_path))
-    if style_issues:
-        print(f"[yellow]⚠️ {len(style_issues)} style issue(s) found in {notebook_path.name}:[/]")
-        for line in style_issues:
-            print("  ", line)
-        
-        if fail_on_style:
-            print("[red]❌ Aborting due to style issues (use --fail-on-style to disable this check).[/]")
-            return  # or sys.exit(1)
-    else:
-        print("[green]✅ No PEP8 style issues detected[/]")
+                
     
     # Placeholder for execution
     if use_conda:
@@ -47,7 +81,7 @@ def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
         print("[bold]⚙️ Running in current environment...[/]")
         # TODO: use execute.py
 
-    # TODO: Generate requirements.txt and environment.yml
+    # DONE: Generate requirements.txt and environment.yml
     # TODO: Generate RO-Crate
     # TODO: Convert notebook to HTML
     # TODO: Validate RO-Crate
