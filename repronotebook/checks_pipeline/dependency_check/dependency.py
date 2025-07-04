@@ -78,7 +78,7 @@ def check_existing_dependency_file(file_path: Path, notebook_imports: list[str])
     all_present = len(missing) == 0
     return all_present, missing
 
-def generate_requirements(notebook_path: str, output_dir: Path, overwrite: bool = False) -> bool:
+def generate_requirements(notebook_path: str, output_dir: Path, overwrite: bool = True) -> bool:
     """Generate a requirements.txt based on notebook imports."""
     try:
         imports = extract_imports_from_notebook(notebook_path)

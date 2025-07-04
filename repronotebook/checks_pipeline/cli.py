@@ -10,17 +10,25 @@ from repronotebook.checks_pipeline.dependency_check.dependency import (
     generate_requirements,
     generate_environment_yml
 )
+from repronotebook.checks_pipeline.conda_env.execute_conda import (
+    create_conda_env,
+    run_notebook_in_env,
+    remove_conda_env
+)
+
 
 
 @click.command()
-@click.argument('notebook_path')
+@click.argument('notebook_path', type=click.Path(exists=True))
 @click.option('--fail-on-style', is_flag=True, help='Abort if flakenb detects any style issues')
 @click.option('--author', default='Unknown', help='Notebook author')
 @click.option('--use-conda', is_flag=True, help='Use Conda environment for execution')
+@click.option('--remove-conda-env', is_flag=True, help='Delete Conda env after execution')
 @click.option('--upload', is_flag=True, help='Upload to Zenodo')
 @click.option('--validate', is_flag=True, help='Validate RO-Crate')
-def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
+def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, upload, validate):
     # Collect all notebooks
+    notebook_path = Path(notebook_path) # Convert to Path object
     notebooks = []
     if notebook_path.is_file() and notebook_path.suffix == ".ipynb":
         notebooks = [notebook_path]
@@ -28,6 +36,7 @@ def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
         notebooks = list(notebook_path.rglob("*.ipynb"))
 
     for nb in notebooks:
+        nb = Path(nb).resolve()  # Convert to absolute path
         relative_name = nb.relative_to(Path.cwd())
         print(f"\n[bold cyan]🔍 Processing:[/] {relative_name}")
         # Style check
@@ -44,10 +53,10 @@ def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
             else:
                 print("[green]✅ No PEP8 style issues detected[/]")
             
-        # ✅ Extract imports from the notebook
+        # Extract imports from the notebook
         notebook_imports = extract_imports_from_notebook(str(nb))
             
-        # ✅ Handle requirements.txt
+        # Handle requirements.txt
         req_path = nb.parent / "requirements.txt"
         if req_path.exists():
             all_present, missing = check_existing_dependency_file(req_path, notebook_imports)
@@ -59,7 +68,7 @@ def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
             if generate_requirements(str(nb), nb.parent, overwrite=True):
                 print("[green]✅ requirements.txt generated[/]")
 
-        # ✅ Handle environment.yml
+        # Handle environment.yml
         env_path = nb.parent / "environment.yml"
         if env_path.exists():
             all_present, missing = check_existing_dependency_file(env_path, notebook_imports)
@@ -70,18 +79,25 @@ def main(notebook_path, fail_on_style, author, use_conda, upload, validate):
         else:
             if generate_environment_yml(str(nb), nb.parent, overwrite=True):
                 print("[green]✅ environment.yml generated[/]")
+        
+        # Handle running in a conda environment.
+        if use_conda:
+            print("[bold]📦 Running in Conda environment...[/]")
+            env_path = nb.parent / "environment.yml"
+            env_name = "repronotebook-run" 
+            if env_path.exists():
+                if create_conda_env(env_path, env_name):
+                    run_notebook_in_env(nb, env_name)
+            else:
+                print("[red]❌ environment.yml not found. Cannot execute in Conda environment.[/]")
+        if use_conda and remove_conda_env:
+            remove_conda_env("repronotebook-run")
 
-                
-    
-    # Placeholder for execution
-    if use_conda:
-        print("[bold]📦 Running in Conda environment...[/]")
-        # TODO: use conda_env.py
-    else:
-        print("[bold]⚙️ Running in current environment...[/]")
-        # TODO: use execute.py
+
+
 
     # DONE: Generate requirements.txt and environment.yml
+    # DONE: Run in conda environment.
     # TODO: Generate RO-Crate
     # TODO: Convert notebook to HTML
     # TODO: Validate RO-Crate
