@@ -13,22 +13,74 @@ Repronotebook is a Python tool that helps validate and ensure the reproducibilit
 
 ## Installation
 
+**Note: This is currently a development project and not yet published to PyPI (Python Package Index).**
+
+### Development Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd repronotebook
+   ```
+
+2. **Set up a virtual environment:**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+3. **Install in development mode:**
+   ```bash
+   pip install -e .
+   ```
+
+### What is this software?
+
+This is a **Command Line Interface (CLI)** tool, not a web application. It runs in your terminal/command prompt like other developer tools (git, npm, etc.). Unlike web apps that run in browsers, CLI tools:
+
+- **Run locally** on your computer via terminal commands
+- **Process files directly** from your file system  
+- **No web server needed** - everything runs on your machine
+- **Perfect for automation** and integration with other developer workflows
+
+### Future PyPI Installation (when published)
+
+Once published to PyPI (Python's package repository), installation will be simple:
 ```bash
 pip install repronotebook
 ```
 
 ## Usage
 
+**Important:** All commands assume you're in the project directory with your virtual environment activated:
+```bash
+cd repronotebook
+source .venv/bin/activate  # You should see (.venv) in your prompt
+```
+
 ### Basic Notebook Validation
 
-Basic usage:
+**Current development usage:**
+```bash
+python -m repronotebook.checks_pipeline.cli path/to/your/notebook.ipynb
+```
+
+**Future usage (when published to PyPI):**
 ```bash
 repronotebook path/to/your/notebook.ipynb
 ```
 
-With options:
+### Example Commands
+
+**Complete validation and RO-Crate generation:**
 ```bash
-repronotebook path/to/your/notebook.ipynb --author "Your Name" --use-conda --fail-on-style --generate-rocrate
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --author "Your Name" --generate-rocrate
+```
+
+**Full pipeline with Zenodo upload:**
+```bash
+export ZENODO_TOKEN="your-api-token"
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --author "Your Name" --generate-rocrate --upload
 ```
 
 ### RO-Crate Generation
@@ -37,25 +89,49 @@ RO-Crate generation is now integrated into the CLI and supports two methods:
 
 #### CLI RO-Crate Generation (Recommended)
 ```bash
-# Generate RO-Crate using library method (default)
-repronotebook notebook.ipynb --generate-rocrate --author "Your Name"
-
-# Generate RO-Crate using manual method
-repronotebook notebook.ipynb --generate-rocrate --rocrate-method manual --author "Your Name"
+# Generate RO-Crate using library method
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --author "Your Name"
 
 # Combined with validation pipeline
-repronotebook notebook.ipynb --generate-rocrate --use-conda --fail-on-style --author "Your Name"
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --use-conda --fail-on-style --author "Your Name"
+
+# Generate and upload to Zenodo
+export ZENODO_TOKEN="your-zenodo-api-token"
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name"
 ```
+
+### Zenodo Upload Integration
+
+Upload your RO-Crates directly to Zenodo for long-term preservation and DOI assignment:
+
+#### Setup Zenodo API Access
+1. Create a Zenodo account at [zenodo.org](https://zenodo.org)
+2. Generate an API token: Account → Applications → Personal access tokens
+3. Set the token as an environment variable:
+   ```bash
+   export ZENODO_TOKEN="your-zenodo-api-token"
+   ```
+
+#### Upload Commands
+```bash
+# Complete workflow: validate → generate RO-Crate → upload to Zenodo
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name"
+
+# Full validation pipeline with upload
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --use-conda --fail-on-style --author "Your Name"
+```
+
+#### Upload Process
+- **Automatic ZIP creation**: RO-Crate is compressed for upload
+- **Metadata generation**: Zenodo-compatible metadata with title, description, and keywords
+- **Draft upload**: Files uploaded as draft for manual review before publishing
+- **DOI assignment**: Permanent DOI assigned upon publication
 
 #### Programmatic RO-Crate Generation
 ```python
-from repronotebook.manual_basic_ro_crate.manual_rocrate import generate_ro_crate
 from repronotebook.ro_crate_library.library_rocrate import generate_ro_crate_with_library
 
-# Manual method
-generate_ro_crate("path/to/folder", "Author Name")
-
-# Library method
+# Library method (recommended)
 generate_ro_crate_with_library("path/to/folder", "Author Name")
 ```
 
@@ -66,9 +142,8 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 - `--fail-on-style`: Abort execution if style issues are detected
 - `--use-conda`: Execute notebook in an isolated Conda environment
 - `--remove-conda-env`: Delete Conda environment after execution
-- `--generate-rocrate`: Generate RO-Crate for the notebook
-- `--rocrate-method`: Choose RO-Crate generation method: `manual` or `library` (default: library)
-- `--upload`: Upload to Zenodo (coming soon)
+- `--generate-rocrate`: Generate RO-Crate for the notebook using library method
+- `--upload`: Upload RO-Crate to Zenodo (requires ZENODO_TOKEN environment variable)
 - `--validate`: Validate RO-Crate (coming soon)
 
 ## Features
@@ -79,10 +154,13 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 - **Multi-notebook Processing**: Process individual notebooks or entire directories
 - **Rich Output**: Provides clear, colorized feedback about the validation process
 - **RO-Crate Generation**: Creates research data packages with proper metadata for reproducibility
-  - Manual generation with custom metadata structure
   - Library-based generation using the `rocrate-py` library
   - Automatic author attribution and date stamping
   - Support for Jupyter notebooks as SoftwareSourceCode entities
+- **Zenodo Integration**: Direct upload to Zenodo for long-term preservation
+  - Automatic ZIP compression and metadata generation
+  - Draft upload workflow for manual review
+  - DOI assignment for permanent citation
 
 ## Requirements
 
@@ -94,7 +172,8 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
   - nbconvert
   - nbformat
   - rich
-  - rocrate (for library-based RO-Crate generation)
+  - rocrate (for RO-Crate generation)
+  - requests (for Zenodo API integration)
   - flakenb (for style checking)
 
 ## Development

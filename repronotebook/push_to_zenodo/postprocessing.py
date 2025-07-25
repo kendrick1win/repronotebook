@@ -7,7 +7,7 @@ import json
 
 def zip_ro_crate(crate_folder: Path):
     zip_path = crate_folder.with_suffix(".zip")
-    shutil.make_archive(zip_path.stem, 'zip', root_dir=crate_folder)
+    shutil.make_archive(str(zip_path.with_suffix("")), 'zip', root_dir=crate_folder.parent, base_dir=crate_folder.name)
     print(f"📦 Zipped RO-Crate at: {zip_path}")
     return zip_path
 
