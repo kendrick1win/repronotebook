@@ -3,6 +3,7 @@ import click
 from rich import print
 from pathlib import Path
 import os
+import json
 from repronotebook.checks_pipeline.styling_check.styling import run_flakenb
 from repronotebook.checks_pipeline.dependency_check.dependency import (
     extract_imports_from_notebook,
@@ -15,8 +16,9 @@ from repronotebook.checks_pipeline.conda_env.execute_conda import (
     run_notebook_in_env,
     remove_conda_env
 )
-from repronotebook.manual_basic_ro_crate.manual_rocrate import generate_ro_crate
 from repronotebook.ro_crate_library.library_rocrate import generate_ro_crate_with_library
+from repronotebook.push_to_zenodo.postprocessing import zip_ro_crate, generate_zenodo_metadata
+from repronotebook.push_to_zenodo.zenodo_upload import upload_ro_crate_to_zenodo
 
 
 
@@ -27,10 +29,9 @@ from repronotebook.ro_crate_library.library_rocrate import generate_ro_crate_wit
 @click.option('--use-conda', is_flag=True, help='Use Conda environment for execution')
 @click.option('--remove-conda-env', is_flag=True, help='Delete Conda env after execution')
 @click.option('--generate-rocrate', is_flag=True, help='Generate RO-Crate for the notebook')
-@click.option('--rocrate-method', type=click.Choice(['manual', 'library']), default='library', help='RO-Crate generation method')
 @click.option('--upload', is_flag=True, help='Upload to Zenodo')
 @click.option('--validate', is_flag=True, help='Validate RO-Crate')
-def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, generate_rocrate, rocrate_method, upload, validate):
+def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, generate_rocrate, upload, validate):
     # Collect all notebooks
     notebook_path = Path(notebook_path) # Convert to Path object
     notebooks = []
@@ -98,14 +99,47 @@ def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, gene
             remove_conda_env("repronotebook-run")
         
         # Generate RO-Crate if requested
+        crate_folder = None
         if generate_rocrate:
             print("[bold]📦 Generating RO-Crate...[/]")
             notebook_dir = nb.parent
             
-            if rocrate_method == 'manual':
-                generate_ro_crate(str(notebook_dir), author)
-            else:  # library method
-                generate_ro_crate_with_library(str(notebook_dir), author)
+            generate_ro_crate_with_library(str(notebook_dir), author)
+            crate_folder = notebook_dir.with_name(f"{notebook_dir.name}-library-ro-crate_v2")
+        
+        # Upload to Zenodo if requested
+        if upload and crate_folder and crate_folder.exists():
+            print("[bold]☁️ Uploading RO-Crate to Zenodo...[/]")
+            try:
+                # Create ZIP archive
+                zip_path = zip_ro_crate(crate_folder)
+                
+                # Generate Zenodo metadata
+                title = f"RO-Crate for {nb.stem}"
+                description = f"Reproducible research package containing Jupyter notebook '{nb.name}' with dependencies and environment specifications."
+                zenodo_metadata_path = generate_zenodo_metadata(crate_folder, title, description, author)
+                
+                # Read metadata for upload
+                with open(zenodo_metadata_path, 'r') as f:
+                    zenodo_metadata = json.load(f)
+                
+                # Upload to Zenodo
+                result = upload_ro_crate_to_zenodo(
+                    crate_zip_path=zip_path,
+                    zenodo_metadata=zenodo_metadata,
+                    sandbox=False,  # Set to True for testing
+                    publish=False   # Manual review before publishing
+                )
+                
+                print(f"[green]✅ Upload complete! Deposition ID: {result['deposition_id']}[/]")
+                
+            except Exception as e:
+                print(f"[red]❌ Zenodo upload failed: {str(e)}[/]")
+                print("[yellow]💡 Make sure ZENODO_TOKEN environment variable is set[/]")
+        elif upload and not generate_rocrate:
+            print("[red]❌ Cannot upload without RO-Crate. Use --generate-rocrate flag[/]")
+        elif upload and not (crate_folder and crate_folder.exists()):
+            print("[red]❌ RO-Crate folder not found for upload[/]")
 
 
 
