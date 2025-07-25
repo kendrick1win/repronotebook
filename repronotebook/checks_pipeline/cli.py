@@ -97,8 +97,8 @@ def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, uplo
 
 
     # DONE: Generate requirements.txt and environment.yml
-    # DONE: Run in conda environment.
-    # TODO: Generate RO-Crate
+    # Fix: Run in conda environment.
+    # In-Progress: Generate RO-Crate
     # TODO: Convert notebook to HTML
     # TODO: Validate RO-Crate
     # TODO: Upload to Zenodo

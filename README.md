@@ -28,7 +28,7 @@ repronotebook path/to/your/notebook.ipynb
 
 With options:
 ```bash
-repronotebook path/to/your/notebook.ipynb --author "Your Name"
+repronotebook path/to/your/notebook.ipynb --author "Your Name" --use-conda --fail-on-style
 ```
 
 ### RO-Crate Generation
@@ -51,15 +51,20 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 
 ### Command Line Options
 
-- `notebook_path`: Path to the Jupyter notebook file (required)
+- `notebook_path`: Path to the Jupyter notebook file or directory (required)
 - `--author`: Specify the author name (default: "Unknown")
-- `--upload`: Flag for future upload functionality (coming soon)
+- `--fail-on-style`: Abort execution if style issues are detected
+- `--use-conda`: Execute notebook in an isolated Conda environment
+- `--remove-conda-env`: Delete Conda environment after execution
+- `--upload`: Upload to Zenodo (coming soon)
+- `--validate`: Validate RO-Crate (coming soon)
 
 ## Features
 
-- **Kernel Validation**: Checks if the required kernel is installed and provides installation instructions if missing
-- **Notebook Execution**: Runs the notebook to verify it executes without errors
-- **Dependency Management**: Automatically generates a `requirements.txt` file based on the notebook's imports
+- **Style Validation**: Uses flakenb to check PEP8 compliance and code style
+- **Dependency Management**: Automatically generates `requirements.txt` and `environment.yml` based on notebook imports
+- **Conda Environment Execution**: Runs notebooks in isolated Conda environments for reproducibility
+- **Multi-notebook Processing**: Process individual notebooks or entire directories
 - **Rich Output**: Provides clear, colorized feedback about the validation process
 - **RO-Crate Generation**: Creates research data packages with proper metadata for reproducibility
   - Manual generation with custom metadata structure
@@ -70,7 +75,7 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 ## Requirements
 
 - Python 3.x
-- Jupyter
+- Conda (optional, for isolated environment execution)
 - Required Python packages:
   - click
   - pipreqs
@@ -78,6 +83,7 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
   - nbformat
   - rich
   - rocrate (for library-based RO-Crate generation)
+  - flakenb (for style checking)
 
 ## Development
 
