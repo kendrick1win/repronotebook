@@ -1,5 +1,0 @@
-LinearRegression
-matplotlib
-numpy
-pandas
-seaborn

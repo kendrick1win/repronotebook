@@ -1,9 +1,0 @@
-name: repronotebook-env
-channels:
-  - defaults
-dependencies:
-  - LinearRegression
-  - matplotlib
-  - numpy
-  - pandas
-  - seaborn
