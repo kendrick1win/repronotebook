@@ -31,7 +31,9 @@ from repronotebook.push_to_zenodo.zenodo_upload import upload_ro_crate_to_zenodo
 @click.option('--generate-rocrate', is_flag=True, help='Generate RO-Crate for the notebook')
 @click.option('--upload', is_flag=True, help='Upload to Zenodo')
 @click.option('--validate', is_flag=True, help='Validate RO-Crate')
-def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, generate_rocrate, upload, validate):
+@click.option('--zenodo-token', help='Zenodo API token (overrides ZENODO_TOKEN env var)')
+@click.option('--sandbox', is_flag=True, help='Use Zenodo sandbox for testing')
+def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, generate_rocrate, upload, validate, zenodo_token, sandbox):
     # Collect all notebooks
     notebook_path = Path(notebook_path) # Convert to Path object
     notebooks = []
@@ -127,7 +129,8 @@ def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, gene
                 result = upload_ro_crate_to_zenodo(
                     crate_zip_path=zip_path,
                     zenodo_metadata=zenodo_metadata,
-                    sandbox=False,  # Set to True for testing
+                    access_token=zenodo_token,  # Pass CLI token
+                    sandbox=sandbox,  # Use CLI flag
                     publish=False   # Manual review before publishing
                 )
                 
