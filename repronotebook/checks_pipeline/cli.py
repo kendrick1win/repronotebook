@@ -15,6 +15,8 @@ from repronotebook.checks_pipeline.conda_env.execute_conda import (
     run_notebook_in_env,
     remove_conda_env
 )
+from repronotebook.manual_basic_ro_crate.manual_rocrate import generate_ro_crate
+from repronotebook.ro_crate_library.library_rocrate import generate_ro_crate_with_library
 
 
 
@@ -24,9 +26,11 @@ from repronotebook.checks_pipeline.conda_env.execute_conda import (
 @click.option('--author', default='Unknown', help='Notebook author')
 @click.option('--use-conda', is_flag=True, help='Use Conda environment for execution')
 @click.option('--remove-conda-env', is_flag=True, help='Delete Conda env after execution')
+@click.option('--generate-rocrate', is_flag=True, help='Generate RO-Crate for the notebook')
+@click.option('--rocrate-method', type=click.Choice(['manual', 'library']), default='library', help='RO-Crate generation method')
 @click.option('--upload', is_flag=True, help='Upload to Zenodo')
 @click.option('--validate', is_flag=True, help='Validate RO-Crate')
-def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, upload, validate):
+def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, generate_rocrate, rocrate_method, upload, validate):
     # Collect all notebooks
     notebook_path = Path(notebook_path) # Convert to Path object
     notebooks = []
@@ -92,13 +96,23 @@ def main(notebook_path, fail_on_style, author, use_conda, remove_conda_env, uplo
                 print("[red]❌ environment.yml not found. Cannot execute in Conda environment.[/]")
         if use_conda and remove_conda_env:
             remove_conda_env("repronotebook-run")
+        
+        # Generate RO-Crate if requested
+        if generate_rocrate:
+            print("[bold]📦 Generating RO-Crate...[/]")
+            notebook_dir = nb.parent
+            
+            if rocrate_method == 'manual':
+                generate_ro_crate(str(notebook_dir), author)
+            else:  # library method
+                generate_ro_crate_with_library(str(notebook_dir), author)
 
 
 
 
     # DONE: Generate requirements.txt and environment.yml
-    # Fix: Run in conda environment.
-    # In-Progress: Generate RO-Crate
+    # DONE: Run in conda environment
+    # DONE: Generate RO-Crate
     # TODO: Convert notebook to HTML
     # TODO: Validate RO-Crate
     # TODO: Upload to Zenodo

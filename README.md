@@ -28,24 +28,34 @@ repronotebook path/to/your/notebook.ipynb
 
 With options:
 ```bash
-repronotebook path/to/your/notebook.ipynb --author "Your Name" --use-conda --fail-on-style
+repronotebook path/to/your/notebook.ipynb --author "Your Name" --use-conda --fail-on-style --generate-rocrate
 ```
 
 ### RO-Crate Generation
 
-The tool now supports two methods for generating RO-Crates:
+RO-Crate generation is now integrated into the CLI and supports two methods:
 
-#### Manual RO-Crate Generation
-```python
-from repronotebook.manual_basic_ro_crate.manual_rocrate import generate_ro_crate
+#### CLI RO-Crate Generation (Recommended)
+```bash
+# Generate RO-Crate using library method (default)
+repronotebook notebook.ipynb --generate-rocrate --author "Your Name"
 
-generate_ro_crate("path/to/folder", "Author Name")
+# Generate RO-Crate using manual method
+repronotebook notebook.ipynb --generate-rocrate --rocrate-method manual --author "Your Name"
+
+# Combined with validation pipeline
+repronotebook notebook.ipynb --generate-rocrate --use-conda --fail-on-style --author "Your Name"
 ```
 
-#### Library-based RO-Crate Generation
+#### Programmatic RO-Crate Generation
 ```python
+from repronotebook.manual_basic_ro_crate.manual_rocrate import generate_ro_crate
 from repronotebook.ro_crate_library.library_rocrate import generate_ro_crate_with_library
 
+# Manual method
+generate_ro_crate("path/to/folder", "Author Name")
+
+# Library method
 generate_ro_crate_with_library("path/to/folder", "Author Name")
 ```
 
@@ -56,6 +66,8 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 - `--fail-on-style`: Abort execution if style issues are detected
 - `--use-conda`: Execute notebook in an isolated Conda environment
 - `--remove-conda-env`: Delete Conda environment after execution
+- `--generate-rocrate`: Generate RO-Crate for the notebook
+- `--rocrate-method`: Choose RO-Crate generation method: `manual` or `library` (default: library)
 - `--upload`: Upload to Zenodo (coming soon)
 - `--validate`: Validate RO-Crate (coming soon)
 
