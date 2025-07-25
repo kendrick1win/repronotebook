@@ -65,7 +65,7 @@
         {
             "@id": "#author",
             "@type": "Person",
-            "name": "Kendrick Lwin"
+            "name": "Test User"
         }
     ]
 }
