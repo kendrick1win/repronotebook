@@ -79,8 +79,12 @@ python -m repronotebook.checks_pipeline.cli notebook.ipynb --author "Your Name" 
 
 **Full pipeline with Zenodo upload:**
 ```bash
+# Using environment variable
 export ZENODO_TOKEN="your-api-token"
-python -m repronotebook.checks_pipeline.cli notebook.ipynb --author "Your Name" --generate-rocrate --upload
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --author "Your Name" --generate-rocrate --upload --sandbox
+
+# Using CLI token (recommended)
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --author "Your Name" --generate-rocrate --upload --zenodo-token "your-token" --sandbox
 ```
 
 ### RO-Crate Generation
@@ -95,9 +99,8 @@ python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --
 # Combined with validation pipeline
 python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --use-conda --fail-on-style --author "Your Name"
 
-# Generate and upload to Zenodo
-export ZENODO_TOKEN="your-zenodo-api-token"
-python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name"
+# Generate and upload to Zenodo (sandbox)
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name" --zenodo-token "your-token" --sandbox
 ```
 
 ### Zenodo Upload Integration
@@ -105,27 +108,76 @@ python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --
 Upload your RO-Crates directly to Zenodo for long-term preservation and DOI assignment:
 
 #### Setup Zenodo API Access
-1. Create a Zenodo account at [zenodo.org](https://zenodo.org)
+
+**For Testing (Recommended):**
+1. Create a **sandbox** account at [sandbox.zenodo.org](https://sandbox.zenodo.org)
 2. Generate an API token: Account → Applications → Personal access tokens
-3. Set the token as an environment variable:
-   ```bash
-   export ZENODO_TOKEN="your-zenodo-api-token"
-   ```
+3. Select scopes: `deposit:write` and `deposit:actions`
+4. Use the `--sandbox` flag for safe testing
+
+**For Production:**
+1. Create a Zenodo account at [zenodo.org](https://zenodo.org)
+2. Generate an API token with same scopes
+3. Omit the `--sandbox` flag
+
+**Token Usage:**
+```bash
+# Method 1: Environment variable
+export ZENODO_TOKEN="your-zenodo-api-token"
+
+# Method 2: CLI argument (recommended)
+--zenodo-token "your-token-here"
+```
 
 #### Upload Commands
+
+**Single Notebook:**
 ```bash
-# Complete workflow: validate → generate RO-Crate → upload to Zenodo
-python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name"
+# Sandbox testing (recommended)
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name" --zenodo-token "your-token" --sandbox
+
+# Production upload
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --author "Your Name" --zenodo-token "your-token"
 
 # Full validation pipeline with upload
-python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --use-conda --fail-on-style --author "Your Name"
+python -m repronotebook.checks_pipeline.cli notebook.ipynb --generate-rocrate --upload --use-conda --fail-on-style --author "Your Name" --zenodo-token "your-token" --sandbox
+```
+
+**Multiple Notebooks (Directory Processing):**
+```bash
+# Process entire directory with multiple notebooks
+python -m repronotebook.checks_pipeline.cli path/to/notebook/directory --generate-rocrate --upload --author "Your Name" --zenodo-token "your-token" --sandbox
 ```
 
 #### Upload Process
+- **Organized Output**: All generated files stored in structured `generated/` directory
 - **Automatic ZIP creation**: RO-Crate is compressed for upload
 - **Metadata generation**: Zenodo-compatible metadata with title, description, and keywords
 - **Draft upload**: Files uploaded as draft for manual review before publishing
+- **Multi-notebook support**: Each notebook gets unique metadata and upload results
 - **DOI assignment**: Permanent DOI assigned upon publication
+
+#### Generated File Structure
+```
+project_directory/
+├── notebooks/
+│   ├── notebook1.ipynb
+│   └── notebook2.ipynb
+└── generated/
+    ├── dependencies/
+    │   ├── requirements.txt
+    │   └── environment.yml
+    ├── ro_crates/
+    │   ├── notebook1-ro-crate/
+    │   ├── notebook1-ro-crate.zip
+    │   ├── notebook2-ro-crate/
+    │   └── notebook2-ro-crate.zip
+    └── zenodo/
+        ├── zenodo_metadata_notebook1.json
+        ├── zenodo_metadata_notebook2.json
+        ├── upload_results_notebook1.json
+        └── upload_results_notebook2.json
+```
 
 #### Programmatic RO-Crate Generation
 ```python
@@ -143,7 +195,9 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 - `--use-conda`: Execute notebook in an isolated Conda environment
 - `--remove-conda-env`: Delete Conda environment after execution
 - `--generate-rocrate`: Generate RO-Crate for the notebook using library method
-- `--upload`: Upload RO-Crate to Zenodo (requires ZENODO_TOKEN environment variable)
+- `--upload`: Upload RO-Crate to Zenodo
+- `--zenodo-token`: Zenodo API token (overrides ZENODO_TOKEN env var)
+- `--sandbox`: Use Zenodo sandbox for testing (recommended for development)
 - `--validate`: Validate RO-Crate (coming soon)
 
 ## Features
@@ -152,15 +206,20 @@ generate_ro_crate_with_library("path/to/folder", "Author Name")
 - **Dependency Management**: Automatically generates `requirements.txt` and `environment.yml` based on notebook imports
 - **Conda Environment Execution**: Runs notebooks in isolated Conda environments for reproducibility
 - **Multi-notebook Processing**: Process individual notebooks or entire directories
+- **Organized Output Structure**: All generated files stored in structured directories
 - **Rich Output**: Provides clear, colorized feedback about the validation process
 - **RO-Crate Generation**: Creates research data packages with proper metadata for reproducibility
   - Library-based generation using the `rocrate-py` library
   - Automatic author attribution and date stamping
   - Support for Jupyter notebooks as SoftwareSourceCode entities
 - **Zenodo Integration**: Direct upload to Zenodo for long-term preservation
+  - Sandbox and production environment support
+  - Flexible authentication (CLI token or environment variable)
   - Automatic ZIP compression and metadata generation
   - Draft upload workflow for manual review
+  - Multi-notebook support with unique file handling
   - DOI assignment for permanent citation
+  - Correct sandbox/production URL display
 
 ## Requirements
 
