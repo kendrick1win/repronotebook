@@ -1,0 +1,17 @@
+{
+  "title": "RO-Crate for test",
+  "upload_type": "dataset",
+  "description": "Reproducible research package containing Jupyter notebook 'test.ipynb' with dependencies and environment specifications.",
+  "creators": [
+    {
+      "name": "Test User 1"
+    }
+  ],
+  "keywords": [
+    "jupyter",
+    "reproducibility",
+    "ro-crate"
+  ],
+  "license": "CC-BY-4.0",
+  "publication_date": "2025-07-25"
+}

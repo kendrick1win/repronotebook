@@ -139,6 +139,9 @@ def upload_ro_crate_to_zenodo(
     """
     uploader = ZenodoUploader(access_token=access_token, sandbox=sandbox)
     
+    # Determine the correct base web URL
+    web_base_url = "https://sandbox.zenodo.org" if sandbox else "https://zenodo.org"
+    
     try:
         # Create deposition
         deposition_id = uploader.create_deposition(zenodo_metadata)
@@ -153,10 +156,10 @@ def upload_ro_crate_to_zenodo(
             doi = uploader.publish_deposition(deposition_id)
             result["doi"] = doi
             print(f"[bold green]🎉 RO-Crate successfully uploaded and published![/]")
-            print(f"[bold]📄 Access your dataset at: https://zenodo.org/record/{deposition_id}[/]")
+            print(f"[bold]📄 Access your dataset at: {web_base_url}/record/{deposition_id}[/]")
         else:
             print(f"[bold yellow]⚠️ RO-Crate uploaded but not published. Visit Zenodo to review and publish.[/]")
-            print(f"[bold]📄 Review at: https://zenodo.org/deposit/{deposition_id}[/]")
+            print(f"[bold]📄 Review at: {web_base_url}/deposit/{deposition_id}[/]")
         
         return result
         

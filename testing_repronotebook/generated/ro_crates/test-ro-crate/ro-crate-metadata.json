@@ -1,0 +1,59 @@
+{
+    "@context": "https://w3id.org/ro/crate/1.1/context",
+    "@graph": [
+        {
+            "@id": "./",
+            "@type": "Dataset",
+            "author": {
+                "@id": "#author"
+            },
+            "datePublished": "2025-07-25",
+            "description": "No description available.",
+            "hasPart": [
+                {
+                    "@id": "requirements.txt"
+                },
+                {
+                    "@id": "environment.yml"
+                },
+                {
+                    "@id": "test.ipynb"
+                }
+            ],
+            "license": "https://creativecommons.org/licenses/by/4.0/",
+            "name": "temp_notebook_dir"
+        },
+        {
+            "@id": "ro-crate-metadata.json",
+            "@type": "CreativeWork",
+            "about": {
+                "@id": "./"
+            },
+            "conformsTo": {
+                "@id": "https://w3id.org/ro/crate/1.1"
+            }
+        },
+        {
+            "@id": "requirements.txt",
+            "@type": "File"
+        },
+        {
+            "@id": "environment.yml",
+            "@type": "File"
+        },
+        {
+            "@id": "test.ipynb",
+            "@type": "File",
+            "programmingLanguage": {
+                "@id": "https://w3id.org/ro/terms#Python",
+                "alternateName": "py",
+                "name": "Python"
+            }
+        },
+        {
+            "@id": "#author",
+            "@type": "Person",
+            "name": "Test User 1"
+        }
+    ]
+}
